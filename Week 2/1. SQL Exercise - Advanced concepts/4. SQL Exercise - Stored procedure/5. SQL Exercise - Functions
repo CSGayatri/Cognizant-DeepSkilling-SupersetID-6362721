@@ -1,0 +1,15 @@
+Exercise 7: Return Data from a Scalar Function
+
+CREATE FUNCTION fn_CalculateAnnualSalary (@EmployeeID INT)
+RETURNS DECIMAL(10, 2)
+AS
+BEGIN
+    DECLARE @AnnualSalary DECIMAL(10, 2);
+
+    -- Fetch the salary of the employee and multiply by 12 for the annual salary
+    SELECT @AnnualSalary = Salary * 12
+    FROM Employees
+    WHERE EmployeeID = @EmployeeID;
+
+    RETURN @AnnualSalary;
+END;
