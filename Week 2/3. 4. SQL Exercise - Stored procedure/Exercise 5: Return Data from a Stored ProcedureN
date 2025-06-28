@@ -1,0 +1,8 @@
+CREATE PROCEDURE sp_CountOrdersByCustomer
+    @CustomerID INT
+AS
+BEGIN
+    SELECT COUNT(*) AS TotalOrders
+    FROM Orders
+    WHERE CustomerID = @CustomerID;
+END;
