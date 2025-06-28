@@ -1,0 +1,12 @@
+CREATE PROCEDURE sp_GetOrdersByCustomer
+    @CustomerID INT
+AS
+BEGIN
+    SELECT o.OrderID, o.OrderDate, p.ProductName, od.Quantity, p.Price
+    FROM Orders o
+    JOIN OrderDetails od ON o.OrderID = od.OrderID
+    JOIN Products p ON od.ProductID = p.ProductID
+    WHERE o.CustomerID = @CustomerID;
+END;
+
+EXEC sp_GetOrdersByCustomer @CustomerID = 1;
