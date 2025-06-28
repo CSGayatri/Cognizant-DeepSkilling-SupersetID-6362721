@@ -1,0 +1,124 @@
+1. Write Testable Code with MoQ
+Here’s a full solution for your assignment **"Write Testable Code with Moq"**, broken into **Task 1** (code to be tested) and **Task 2** (unit testing with NUnit and Moq).
+
+## ✅ **Task 1: Create Class Library `CustomerCommLib`**
+
+Define Interface and Implement `MailSender`:
+namespace CustomerCommLib
+{
+    public interface IMailSender
+    {
+        bool SendMail(string toAddress, string message);
+    }
+
+    public class MailSender : IMailSender
+    {
+        public bool SendMail(string toAddress, string message)
+        {
+            MailMessage mail = new MailMessage();
+            SmtpClient smtpServer = new SmtpClient("smtp.gmail.com");
+
+            mail.From = new MailAddress("your_email_address@gmail.com");
+            mail.To.Add(toAddress);
+            mail.Subject = "Test Mail";
+            mail.Body = message;
+
+            smtpServer.Port = 587;
+            smtpServer.Credentials = new NetworkCredential("username", "password");
+            smtpServer.EnableSsl = true;
+
+            smtpServer.Send(mail);
+            return true;
+        }
+    }
+}
+```
+
+### 4. Add `CustomerComm` Class:
+
+```csharp
+namespace CustomerCommLib
+{
+    public class CustomerComm
+    {
+        IMailSender _mailSender;
+
+        public CustomerComm(IMailSender mailSender)
+        {
+            _mailSender = mailSender;
+        }
+
+        public bool SendMailToCustomer()
+        {
+            // Simulated mail sending logic
+            _mailSender.SendMail("cust123@abc.com", "Some Message");
+            return true;
+        }
+    }
+}
+```
+
+Now build this project. ✅
+
+---
+
+## ✅ **Task 2: Create Unit Test Project `CustomerComm.Tests`**
+
+### 1. Create New Project:
+
+* Add a new Class Library project: `CustomerComm.Tests`.
+
+### 2. Add NuGet Packages:
+
+Use NuGet Package Manager or Console:
+
+```bash
+Install-Package NUnit
+Install-Package NUnit3TestAdapter
+Install-Package Moq
+```
+
+### 3. Add Reference:
+
+* Add reference to `CustomerCommLib` in the test project.
+
+---
+
+### 4. Write Unit Test with Moq
+
+```csharp
+using NUnit.Framework;
+using Moq;
+using CustomerCommLib;
+
+namespace CustomerComm.Tests
+{
+    [TestFixture]
+    public class CustomerCommTests
+    {
+        private Mock<IMailSender> _mockMailSender;
+        private CustomerComm _customerComm;
+
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            _mockMailSender = new Mock<IMailSender>();
+            _mockMailSender
+                .Setup(sender => sender.SendMail(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(true);
+
+            _customerComm = new CustomerComm(_mockMailSender.Object);
+        }
+
+        [Test]
+        [TestCase]
+        public void SendMailToCustomer_ShouldReturnTrue_WhenMailIsSentSuccessfully()
+        {
+            // Act
+            var result = _customerComm.SendMailToCustomer();
+
+            // Assert
+            Assert.IsTrue(result);
+        }
+    }
+}
